@@ -17,13 +17,20 @@ const readPostData = async (
   });
 };
 
-const handleData = async (ping: PingStat): Promise<void> => {
-  pingService.add(ping);
+const handleData = async (ping: PingStat, clientId: string): Promise<void> => {
+  if (!pingService.add(ping, clientId)) {
+    console.log("ignore duplicate ping");
+  }
 };
 
 const requestListener = async (req: IncomingMessage, res: ServerResponse) => {
   console.log(`${req.method} ${req.url}`);
   if (req.url === "/data" && req.method === "POST") {
+    const [data, ok] = await readPostData(req);
+    if (data) {
+      const clientId = "" + (req.headers["x-client-id"] || "");
+      await handleData(JSON.parse(data) as PingStat, clientId);
+    }
     const rand = Math.random() * 100;
     if (rand > 60) {
       if (rand > 80) {
@@ -37,10 +44,6 @@ const requestListener = async (req: IncomingMessage, res: ServerResponse) => {
       }
     }
     console.log("send ok");
-    const [data, ok] = await readPostData(req);
-    if (data) {
-      await handleData(JSON.parse(data) as PingStat);
-    }
     res.writeHead(200);
     res.end("OK");
     return;

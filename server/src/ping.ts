@@ -1,21 +1,22 @@
 export interface PingStat {
-  id: number;
+  pingId: number;
   deliveryAttempt: number;
   date: number;
   responseTime: number;
 }
 
 export class PingService {
-  private lastPingDate: number = -1;
   private pings: number[] = [];
+  private lastPingId = new Map<string, number>();
 
-  add(ping: PingStat) {
-    /*
-        if(ping.date < this.lastPingDate) {
-            return
-        }
-        */
+  add(ping: PingStat, clientId: string): boolean {
+    const lastPingId = this.lastPingId.get(clientId) || -1;
+    if (ping.pingId <= lastPingId) {
+      return false;
+    }
+    this.lastPingId.set(clientId, ping.pingId);
     this.pings.push(ping.responseTime);
+    return true;
   }
 
   getStats(): [number, number] {

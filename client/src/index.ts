@@ -1,6 +1,7 @@
 import { ClientRequest } from "http";
 import { request as httpsRequest } from "https";
 import { request as httpRequest } from "http";
+import { randomBytes } from "crypto";
 
 const REQUEST_TIMEOUT = 10 * 1000;
 const TIMEOUT_CODE = -1;
@@ -14,6 +15,8 @@ const stats = {
 const sleep = async (timeout: number): Promise<void> => {
   return new Promise((resolve) => setTimeout(resolve, timeout));
 };
+
+const clientId = randomBytes(12).toString("hex");
 
 const getTime = (): number => new Date().getTime();
 
@@ -77,6 +80,7 @@ const sendData = async (
     headers: {
       "Content-Type": "application/json",
       "Content-Length": Buffer.byteLength(message),
+      "X-Client-Id": clientId,
     },
   };
   console.log(`sendData: ${message}`);
