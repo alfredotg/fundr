@@ -109,7 +109,7 @@ const trySendData = async (pingId: number, time: number): Promise<void> => {
         Math.random() * (deliveryAttempt * 100),
         60000
       );
-      console.log(`request failed, sleep ${sleepTime}ms`);
+      console.log(`request failed, error: ${e}, sleep ${sleepTime}ms`);
       await sleep(sleepTime);
     }
   }

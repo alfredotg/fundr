@@ -42,13 +42,11 @@ const requestListener = async (req: IncomingMessage, res: ServerResponse) => {
   console.log(`${req.method} ${req.url}`);
   if (req.url === "/data" && req.method === "POST") {
     const [data, ok] = await readPostData(req);
-    if (!ok) {
+    if (!ok || !data) {
       return sendResponse(res, HttpStatusCode.BAD_REQUEST, "ERROR");
     }
-    if (data) {
-      const clientId = "" + (req.headers["x-client-id"] || "");
-      await handleData(JSON.parse(data) as PingStat, clientId);
-    }
+    const clientId = "" + (req.headers["x-client-id"] || "");
+    await handleData(JSON.parse(data) as PingStat, clientId);
     const rand = Math.random() * 100;
     if (rand > 60) {
       if (rand > 80) {
