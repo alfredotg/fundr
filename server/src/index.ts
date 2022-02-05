@@ -7,12 +7,12 @@ const readPostData = async (
   req: IncomingMessage
 ): Promise<[string, boolean]> => {
   return new Promise((resolve, error) => {
-    let body = "";
-    req.on("data", (chunk) => {
-      body += chunk;
+    const buffers: Buffer[] = [];
+    req.on("data", (data) => {
+      buffers.push(data);
     });
     req.on("end", () => {
-      resolve([body, req.complete]);
+      resolve([Buffer.concat(buffers).toString("utf-8"), req.complete]);
     });
   });
 };
